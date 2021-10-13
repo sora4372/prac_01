@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Map</title>
+
+    <script>
+
+        const favorite = [
+            {lat : 34.3766847, lng : 139.2463006},
+            {lat : 34.2203265, lng : 139.1517739}, 
+            {lat : 30.3190627, lng : 130.530791},
+            {lat : 35.36058968580919, lng : 138.72727753822224},
+            {lat : 37.3995976, lng : 136.9857019},//너무 야마오쿠... 아닐지도...
+            
+
+  
+        ];
+
+        let markers = [];
+        let map;
+        let kyoto = {lat : 34.986250, lng: 135.758795}
+        function initmap() {
+             map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 7,
+                    center: kyoto,
+                });
+            document.getElementById("drop").addEventListener("click", drop);
+            
+            let infoWindow = new google.maps.InfoWindow({
+                content : "click the map to get Lat/Lng",
+                position : kyoto,
+            });
+
+            infoWindow.open(map);
+
+            map.addListener("click",(mapsMouseEvent)=>{
+                infoWindow.close();
+                infoWindow = new google.maps.InfoWindow({
+                    position : mapsMouseEvent.latLng,
+                });
+                infoWindow.setContent(
+                    JSON.stringify(mapsMouseEvent.latLng.toJSON(),null,2)
+                );
+                infoWindow.open(map);
+            });
+        }
+
+        function drop() {
+            clearMarkers();
+
+            for (let i = 0; i < favorite.length; i++) {
+                addMarkerWithTimeout(favorite[i], i * 200);
+            }
+        }
+
+        function addMarkerWithTimeout(position, timeout) {
+        window.setTimeout(() => {
+            markers.push(
+            new google.maps.Marker({
+                position: position,
+                map,
+                animation: google.maps.Animation.DROP,
+            })
+            );
+         }, timeout);
+        }
+
+        function clearMarkers() {
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+            }
+            markers = [];
+        }
+
+        
+
+    </script>
+    <style>
+
+            /* Set the size of the div element that contains the map */
+            #map {
+            width : 90%;
+            /* The height is 400 pixels */
+            height : 800px;
+            margin : 20px auto;
+            /* The width is the width of the web page */
+            }   
+            #floating-panel{
+                margin : 0 auto;
+                width : 30%;
+                text-align: center;
+            }
+            #drop{
+                width :200px;
+                height : 30px;
+            }
+          
+
+    </style>
+  </head>
+  <body>
+    
+    <!--The div element for the map -->
+    <div id="floating-panel">
+        <h3>KOJI MAP</h3>
+        <button id="drop">Drop Markers</button>
+      </div>
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlSpz0t09quyc7I5BFBQfR4b986t7Fij0&callback=initmap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
